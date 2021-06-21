@@ -35,7 +35,10 @@ pipeline {
                         dir ('prod'){
                             git branch: 'main', url: 'https://github.com/khvat-ea/les_11.git'
                         }
-                        sh 'docker build --build-arg path_to_war="./target/hello-1.0.war" --file "./prod/production/Dockerfile" .'
+                        sh 'docker build --build-arg path_to_war="./target/hello-1.0.war" --file "./prod/production/Dockerfile" --tag khvatea/web_app_boxfuse:2.0.0 .'
+                        script {
+                            docker.build "khvatea/web_app_boxfuse" + ":2.0.0"
+                        }
                     }
                 }
             }
