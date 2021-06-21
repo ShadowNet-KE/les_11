@@ -3,7 +3,7 @@ pipeline {
 
     stages {
         stage ('Build project - boxfuse') {
-            agent {
+            agent builder {
                 docker { 
                     image 'khvatea/java-builder:0.0.2'
                     args '-v /var/run/docker.sock:/var/run/docker.sock'
@@ -17,7 +17,7 @@ pipeline {
                 }
                 stage ('Build java project') {
                     steps {
-                        sh 'cd boxfuse-origin-1'
+                        sh 'cd $pwd'
                         sh 'mvn package'
                     }
                 }
