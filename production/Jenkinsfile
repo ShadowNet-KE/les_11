@@ -2,23 +2,28 @@ pipeline {
     agent none
 
     stages {
-        stage ('Build project - boxfuse') {
-            agent builder {
-                docker { 
-                    image 'khvatea/java-builder:0.0.2'
-                    args '-v /var/run/docker.sock:/var/run/docker.sock'
-                }                
-            }
+        stage ('Get builder node') {
+            agent { label 'builder' }
             stages {
-                stage ('Clone git repository') {
-                    steps {
-                        git 'https://github.com/khvat-ea/boxfuse-origin-1.git'
+                stage ('Build project - boxfuse') {
+                    agent {
+                        docker { 
+                            image 'khvatea/java-builder:0.0.2'
+                            args '-v /var/run/docker.sock:/var/run/docker.sock'
+                        }                
                     }
-                }
-                stage ('Build java project') {
-                    steps {
-                        sh 'cd $pwd'
-                        sh 'mvn package'
+                    stages {
+                        stage ('Clone git repository') {
+                            steps {
+                                git 'https://github.com/khvat-ea/boxfuse-origin-1.git'
+                            }
+                        }
+                        stage ('Build java project') {
+                            steps {
+                                sh 'cd $pwd'
+                                sh 'mvn package'
+                            }
+                        }
                     }
                 }
             }
