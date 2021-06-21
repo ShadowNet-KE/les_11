@@ -14,6 +14,9 @@ pipeline {
                     reuseNode true
                 }                
              }
+             environment {
+                PROD_PATH='$pwd'
+             }
             stages {
                 stage ('Clone git repository') {
                     steps {
@@ -22,8 +25,17 @@ pipeline {
                 }
                 stage ('Build java project') {
                     steps {
-                        sh 'cd $pwd'
-                        sh 'mvn package'
+                        sh 'ls -la $pwd'
+                        // sh 'mvn package'
+                    }
+                }
+                stage ('Make docker image') {
+                    steps {
+                        sh 'ls -la $pwd'
+                        dir ('prod'){
+                            git branch: 'main', url: 'https://github.com/khvat-ea/les_11.git'
+                        }
+                        sh 'docker build --build-arg path_to_war="./target/hello-1.0.war" --file "./prod/production/Dockerfile" .'
                     }
                 }
             }
