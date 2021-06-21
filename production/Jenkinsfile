@@ -2,33 +2,28 @@ pipeline {
     agent none
 
     stages {
-        // Set node builder for assembly
-        stage ('Set builder node') {
-            agent { label 'builder' }
+        stage ('Build project - boxfuse') {
+            agent {
+                docker { 
+                    image 'khvatea/java-builder:0.0.2'
+                    // Set node builder for assembly
+                    label 'builder'
+                    args '-v /var/run/docker.sock:/var/run/docker.sock'
+                    // Run the container on the node specified at the top-level of the Pipeline, in the same workspace, rather than on a new node entirely.
+                    // Otherwise, dind will start not on the 'builder' node
+                    reuseNode true
+                }                
+             }
             stages {
-                // Build in docker project
-                stage ('Build project - boxfuse') {
-                    agent {
-                        docker { 
-                            image 'khvatea/java-builder:0.0.2'
-                            args '-v /var/run/docker.sock:/var/run/docker.sock'
-                            // Run the container on the node specified at the top-level of the Pipeline, in the same workspace, rather than on a new node entirely.
-                            // Otherwise, dind will start not on the 'builder' node
-                            reuseNode true
-                        }                
+                stage ('Clone git repository') {
+                    steps {
+                        git 'https://github.com/khvat-ea/boxfuse-origin-1.git'
                     }
-                    stages {
-                        stage ('Clone git repository') {
-                            steps {
-                                git 'https://github.com/khvat-ea/boxfuse-origin-1.git'
-                            }
-                        }
-                        stage ('Build java project') {
-                            steps {
-                                sh 'cd $pwd'
-                                sh 'mvn package'
-                            }
-                        }
+                }
+                stage ('Build java project') {
+                    steps {
+                        sh 'cd $pwd'
+                        sh 'mvn package'
                     }
                 }
             }
