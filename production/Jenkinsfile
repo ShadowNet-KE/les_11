@@ -2,14 +2,18 @@ pipeline {
     agent none
 
     stages {
-        stage ('Get builder node') {
+        // Set node builder for assembly
+        stage ('Set builder node') {
             agent { label 'builder' }
             stages {
+                // Build in docker project
                 stage ('Build project - boxfuse') {
                     agent {
                         docker { 
                             image 'khvatea/java-builder:0.0.2'
                             args '-v /var/run/docker.sock:/var/run/docker.sock'
+                            // Run the container on the node specified at the top-level of the Pipeline, in the same workspace, rather than on a new node entirely.
+                            // Otherwise, dind will start not on the 'builder' node
                             reuseNode true
                         }                
                     }
