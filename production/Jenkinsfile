@@ -1,0 +1,23 @@
+Pipeline {
+    agent none
+
+    stages {
+        agent {
+            docker { 
+                image 'khvatea/java-builder:0.0.1'
+                args '-v /var/run/docker.sock:/var/run/docker.sock'
+            }                
+        }
+        stage ('Clone git repository') {
+            steps {
+                git 'https://github.com/khvat-ea/boxfuse-origin-1.git'
+            }
+        }
+        stage ('Build java project') {
+            steps {
+                sh 'cd boxfuse-origin-1'
+                sh 'mvn package'
+            }
+        }
+    }
+}
