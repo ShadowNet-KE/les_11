@@ -1,8 +1,12 @@
 pipeline {
+    environment{
+        dockerImage = 'khvatea/web_app_boxfuse:2.0.0'
+    }
+
     agent none
 
     stages {
-        stage ('Build project - boxfuse') {
+        stage ('Build app boxfuse') {
             agent {
                 docker { 
                     image 'khvatea/java-builder:0.0.2'
@@ -18,26 +22,38 @@ pipeline {
                 PROD_PATH='$pwd'
              }
             stages {
-                stage ('Clone git repository') {
+                stage ('Cloning Git boxfuse project') {
                     steps {
                         git 'https://github.com/khvat-ea/boxfuse-origin-1.git'
                     }
                 }
-                stage ('Build java project') {
+                stage ('Build boxfuse project') {
                     steps {
                         sh 'ls -la $pwd'
                         // sh 'mvn package'
                     }
                 }
-                stage ('Make docker image') {
+                stage ('Cloning Git deploy files') {
                     steps {
-                        sh 'ls -la $pwd'
                         dir ('prod'){
                             git branch: 'main', url: 'https://github.com/khvat-ea/les_11.git'
-                        }
+                        } 
+                    }
+                }
+                stage ('Building image'){
+                    steps{
                         sh 'docker build --build-arg path_to_war="./target/hello-1.0.war" --file "./prod/production/Dockerfile" --tag khvatea/web_app_boxfuse:2.0.0 .'
                         script {
-                            docker.build "khvatea/web_app_boxfuse" + ":2.0.0"
+                            dockerImage = docker.image ("khvatea/web_app_boxfuse:2.0.0")
+                        }
+                    }
+                }
+                stage ('Push image to DockerHub') {
+                    steps {
+                        script{
+                            docker.withRegistry( 'https://index.docker.io/v1/', 'ef60b993-2c78-4b61-8454-7ae438597e64' ) {
+                                dockerImage.push()
+                            }
                         }
                     }
                 }
