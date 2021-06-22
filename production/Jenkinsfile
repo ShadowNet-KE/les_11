@@ -1,6 +1,6 @@
 pipeline {
     environment{
-        dockerImage = 'khvatea/web_app_boxfuse:2.0.0'
+        dockerImage = ''
     }
 
     agent none
@@ -17,9 +17,6 @@ pipeline {
                     // Otherwise, dind will start not on the 'builder' node
                     reuseNode true
                 }                
-             }
-             environment {
-                PROD_PATH='$pwd'
              }
             stages {
                 stage ('Cloning Git boxfuse project') {
@@ -55,6 +52,27 @@ pipeline {
                                 dockerImage.push()
                             }
                         }
+                    }
+                }
+            }
+        }
+
+        stage ('Deploy image to production') {
+            agent { label 'prod' }
+            stages{
+                stage ('Get docker image from DockerHub') {
+                    steps {
+                        script{
+                            docker.withRegistry( 'https://index.docker.io/v1/', 'ef60b993-2c78-4b61-8454-7ae438597e64' ) {
+                                dockerImage = docker.image ('khvatea/web_app_boxfuse:2.0.0')
+                                dockerImage.pull()
+                            }
+                        }
+                    }
+                }
+                stage ('Start Web-application boxfuse'){
+                    steps{
+                        sh 'docker run -d -p 8090:8080 --name boxfuse khvatea/web_app_boxfuse:2.0.0'
                     }
                 }
             }
