@@ -27,7 +27,7 @@ pipeline {
                 stage ('Build boxfuse project') {
                     steps {
                         sh 'ls -la $pwd'
-                        // sh 'mvn package'
+                        sh 'mvn package'
                     }
                 }
                 stage ('Cloning Git deploy files') {
