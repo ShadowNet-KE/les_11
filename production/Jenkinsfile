@@ -11,7 +11,7 @@ pipeline {
                 docker { 
                     image 'khvatea/java-builder:0.0.2'
                     // Set node builder for assembly
-                    label 'builder'
+                    label 'jenkins-agent'
                     args '-v /var/run/docker.sock:/var/run/docker.sock'
                     // Run the container on the node specified at the top-level of the Pipeline, in the same workspace, rather than on a new node entirely.
                     // Otherwise, dind will start not on the 'builder' node
